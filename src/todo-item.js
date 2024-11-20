@@ -13,7 +13,7 @@ function TodoItem({ task, deleteTaskCallback, toggleTaskCallback }) {
                 checked={task.completed}
                 onChange={handleChange}
             />
-            <span className="text">{task}</span>
+            <span className="text">{task.text}</span>
             <button
                 type="button"
                 aria-label="Delete task"

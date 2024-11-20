@@ -1,16 +1,19 @@
 import { useState } from 'react';
+import { useSelector, useDispatch } from "react-redux";
+import { addTodo, toggleComplete, deleteTodo } from "./todoSlice";
 import TodoItem from './todo-item';
 import './todo.css'
 
-const initialTasks = [
-    { id: window.self.crypto.randomUUID(), text: 'Drink some coffee', completed: true },
-    { id: window.self.crypto.randomUUID(), text: 'Create a TODO app', completed: false },
-    { id: window.self.crypto.randomUUID(), text: 'Drink some more coffee', completed: false }
-];
+// const initialTasks = [
+//     { id: window.self.crypto.randomUUID(), text: 'Drink some coffee', completed: true },
+//     { id: window.self.crypto.randomUUID(), text: 'Create a TODO app', completed: false },
+//     { id: window.self.crypto.randomUUID(), text: 'Drink some more coffee', completed: false }
+// ];
 
 function Todo() {
-    const [tasks, setTasks] = useState(initialTasks);
+    const tasks = useSelector((state) => state.todos);
     const [newTaskText, setNewTaskText] = useState("");
+    const dispatch = useDispatch();
 
     function handleInputChange(event) {
         setNewTaskText(event.target.value);
@@ -18,24 +21,18 @@ function Todo() {
 
     function addTask(newTask) {
         if (newTask.trim() !== "") {
-            setTasks([...tasks, { id: window.self.crypto.randomUUID(), text: newTask, completed: false }]);
+            dispatch(addTodo(newTask));
             setNewTaskText("");
         }
     }
 
     function deleteTask(id) {
-        const updatedTasks = tasks.filter(task => task.id !== id);
-        setTasks(updatedTasks);
+        dispatch(deleteTodo(id));
     }
 
     function toggleTask(id) {
-        setTasks(tasks.map(task => {
-            if (task.id === id) {
-                return { ...task, completed: !task.completed };
-            } else {
-                return task;
-            }
-        }));
+        console.log(id);
+        dispatch(toggleComplete(id));
     }
 
     return (
@@ -62,13 +59,16 @@ function Todo() {
                 </form>
             </header>
             <ol id="todo-list" aria-live="polite">
-                {tasks.map((task) =>
-                    <TodoItem
-                        key={task.id}
-                        task={task.text}
-                        deleteTaskCallback={() => deleteTask(task.id)}
-                        toggleTaskCallback={toggleTask}
-                    />
+                {tasks.map((task) => {
+                    if (!task.completed) {
+                        return <TodoItem
+                            task={task}
+                            deleteTaskCallback={() => deleteTask(task.id)}
+                            toggleTaskCallback={toggleTask}
+                        />
+                    }
+                    return <div></div>
+                }
                 )}
             </ol>
         </article>
